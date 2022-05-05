@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const port=process.env.PORT || 5000;
 const app=express();
@@ -15,9 +15,29 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 console.log('connect');
 
+
 const run=async()=>{
+
 	try{
- client.connect();
+   await client.connect();
+   const carCollection = client.db("Alfa-Auto-Park").collection("car");
+   app.get('/inventory',async(req,res)=>{
+	   const query={};
+	   const cursor=  carCollection.find(query);
+	   const result= await cursor.toArray()
+	   if(result.length==0) {
+		   return res.send({success:false,error:'No document found'})
+	   }
+	   res.send({success:true,data:result})
+   });
+
+   app.get('/inventory/:id',async(req,res)=>{
+	   const id =req.params.id;
+	   const query={_id:ObjectId(id)};
+	   const result=await carCollection.findOne(query);
+	   res.send({success:true,data:result})
+   })
+
  
 	}
 	catch{
