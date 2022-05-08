@@ -37,6 +37,23 @@ const run=async()=>{
 	   const result=await carCollection.findOne(query);
 	   res.send({success:true,data:result})
    })
+   ;
+
+   //update 
+   app.put('/inventory/:id',async(req,res)=>{
+	   const id=req.params.id;
+	   const updatedUser=req.body;
+	   const filter={_id:ObjectId(id)};
+	   const options={upsertedId:true};
+	   const updateDoc={
+		   $set:{
+                 quantity:updatedUser.quantity
+		   }
+	   }
+	  const result= await carCollection.updateOne(filter,updateDoc,options);
+	  res.send(result);
+
+   })
 
  
 	}
